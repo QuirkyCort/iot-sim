@@ -1,0 +1,293 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IoT Simulator with Blynk</title>
+  <script src="jquery/jquery.min.js"></script>
+  <script src="blynk/blynk-browser.js?v=fde46afb"></script>
+
+  <script src="blockly/blockly_compressed.js"></script>
+  <script src="blockly/blocks_compressed.js"></script>
+  <script src="blockly/javascript_compressed.js"></script>
+  <script src="blockly/msg/js/en.js"></script>
+
+  <script src="js/customBlocks.js?v=050eb0fe"></script>
+
+  <link rel="stylesheet" href="css/main.css?v=8da919b6">
+</head>
+
+<body>
+
+  <!-- <ol>
+    <li>Login with your account in the Blynk App</li>
+    <li>Start a new project using a "Generic Board (Ethernet)" device</li>
+    <li>Go to project settings and send Auth Token to your email</li>
+    <li>Paste your Auth Token and connect!</li>
+    <li>Control the I/O ports using virtual pins V0 (LED) and V2 (Door)</li>
+    <li>Add a "Notification" widget to receive notification when button is pressed</li>
+  </ol>
+  Auth token: <input id="auth" type="text"> <input id="btnConnect" type="button" value="Connect"> Status: <span id="status"></span><br> -->
+
+  <h1>Internet-of-Things Simulator (Blynk)</h1>
+
+  <div id="simulator">
+    <img id="background" draggable="false" src="images/background.png?v=29904443">
+    <img id="led" draggable="false" src="images/ledOff.png?v=0f115ad9">
+    <img id="button" draggable="false" src="images/buttonOff.png?v=a0014273">
+    <img id="door" draggable="false" src="images/doorClose.png?v=2a176ab2">
+    <img id="plant" draggable="false" src="images/plant1.png?v=2de6a6f5">
+    <img id="sprinkler" draggable="false" src="images/sprinklerOff.png?v=e77ccb1f">
+  </div>
+
+  <br>
+  <button id="run">Run</button>
+  <input id="console" type="text" disabled style="width: 40em;">
+  <br><br>
+
+  <div id="blocklyDiv" style="height: 600px; width: 1200px;"></div>
+  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+    <category name="Blynk" colour="#9fa55b">
+      <block type="when_started"></block>
+      <block type="loop_forever"></block>
+      <block type="on_write">
+        <field name="pin">V0</field>
+      </block>
+      <block type="data"></block>
+      <block type="a0"></block>
+      <block type="d1_clicked"></block>
+      <block type="connect">
+        <field name="auth"></field>
+      </block>
+      <block type="notification"></block>
+      <block type="change_state">
+        <field name="pin">D0</field>
+        <field name="state">ON</field>
+      </block>
+    </category>
+    <category name="Logic" colour="#5b80a5">
+      <block type="controls_if"></block>
+      <block type="logic_compare">
+        <field name="OP">EQ</field>
+      </block>
+    </category>
+    <category name="Loops" colour="#5ba55b">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Math" colour="#5b67a5">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+      <block type="math_arithmetic">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Text" colour="#5ba58c">
+      <block type="text">
+        <field name="TEXT"></field>
+      </block>
+      <block type="text_join">
+        <mutation items="2"></mutation>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <!-- <block type="parsefloat"></block> -->
+    </category>
+  </xml>
+
+  <script type="text/javascript">
+    var blynk;
+
+    var initBlynk = function(auth) {
+      blynk = new Blynk.Blynk(auth);
+
+      /* For custom WsClient connection:
+      var blynk = new Blynk.Blynk(auth, {
+        connector: new Blynk.WsClient({
+          addr: 'localhost', port:8080, path: '/'
+        })
+      });
+      */
+
+      var v0 = new blynk.VirtualPin(0);
+      var v1 = new blynk.VirtualPin(1);
+      var v2 = new blynk.VirtualPin(2);
+      var v3 = new blynk.VirtualPin(3);
+      // var v5 = new blynk.VirtualPin(5); // for analog read
+
+      v0.on('write', function(param) {
+        var status = param[0];
+        console.log('V0: ' + status);
+        if (typeof onWriteV0 == 'function') {
+          onWriteV0(status);
+        }
+      });
+
+      v1.on('write', function(param) {
+        var status = param[0];
+        console.log('V1: ' + status);
+        if (typeof onWriteV1 == 'function') {
+          onWriteV1(status);
+        }
+      });
+
+      v2.on('write', function(param) {
+        var status = param[0];
+        console.log('V2: ' + status);
+        if (typeof onWriteV2 == 'function') {
+          onWriteV2(status);
+        }
+      });
+
+      v3.on('write', function(param) {
+        var status = param[0];
+        console.log('V3: ' + status);
+        if (typeof onWriteV3 == 'function') {
+          onWriteV3(status);
+        }
+      });
+
+      // v5.on('read', function(){
+      //   v5.write(plantWater * 10);
+      // });
+
+      blynk.on('connect', function() {
+        $("#status").text("Connected");
+        console.log("Blynk ready. Sending sync request...");
+        blynk.syncAll();
+      });
+      blynk.on('disconnect', function() {
+        $("#status").text("Disconnected");
+        console.log("Blynk disconnected.");
+      });
+    };
+
+    function runBlocks() {
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
+      code =
+        'function onWriteV0(){};\n' +
+        'function onWriteV1(){};\n' +
+        'function onWriteV2(){};\n' +
+        'function onWriteV3(){};\n' +
+        'function whenStarted(){};\n' +
+        'function d1Clicked(){};\n' +
+        'function _loop(){};\n' +
+        code;
+
+      // console.log(code);
+      var geval = eval; // Run eval in global scope
+
+      try {
+        geval(code);
+        whenStarted();
+        $('#run').attr('disabled', true);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    function saveBlocks() {
+      if (workspace) {
+        let dom = Blockly.Xml.workspaceToDom(workspace);
+        let xmlText = Blockly.Xml.domToText(dom);
+        localStorage.setItem('blocklyIoTXML', xmlText);
+      }
+    }
+
+    function loadBlocks() {
+      var xmlText = localStorage.getItem('blocklyIoTXML')
+      if (xmlText) {
+        workspace.clear();
+        let dom = Blockly.Xml.textToDom(xmlText);
+        Blockly.Xml.domToWorkspace(dom, workspace);
+      }
+    }
+
+    function enableRun() {
+      $('#run').attr('disabled', false);
+    }
+
+    var plantWater = 1000;
+    var sprinklerOn = false;
+
+    function init() {
+      $('#btnConnect').click(function() {
+        initBlynk($("#auth").val());
+      });
+
+      Blockly.defineBlocksWithJsonArray(customBlocks);
+      workspace = Blockly.inject('blocklyDiv', { toolbox: document.getElementById('toolbox') });
+      workspace.addChangeListener(saveBlocks);
+      workspace.addChangeListener(enableRun);
+      workspace.addChangeListener(Blockly.Events.disableOrphans);
+      loadBlocks();
+
+      $('#button').on('pointerdown', function() {
+        $('#button').attr('src', 'images/buttonOn.png?v=6a4c085b');
+        if (typeof d1Clicked == 'function') {
+          d1Clicked();
+        }
+      });
+      $('#button').on('pointerup', function() {
+        $('#button').attr('src', 'images/buttonOff.png?v=a0014273');
+      });
+      $('#button').on('pointerleave', function() {
+        $('#button').attr('src', 'images/buttonOff.png?v=a0014273');
+      });
+
+      $('#run').click(runBlocks);
+
+      setInterval(function(){
+        if (plantWater > 0) {
+          plantWater -= 10;
+        }
+
+        if (sprinklerOn && plantWater < 1000) {
+          plantWater += 50;
+          if (plantWater > 1000) {
+            plantWater = 1000;
+          }
+        }
+
+        if (plantWater > 666) {
+          $('#plant').attr('src', 'images/plant1.png?v=2de6a6f5');
+        } else if (plantWater > 333) {
+          $('#plant').attr('src', 'images/plant2.png?v=9a51b033');
+        } else {
+          $('#plant').attr('src', 'images/plant3.png?v=d3579827');
+        }
+      }, 750);
+
+      setInterval(function(){
+        if (typeof _loop == 'function') {
+          _loop();
+        }
+      }, 1000);
+    }
+
+    init();
+
+  </script>
+</body>
+</html>
