@@ -261,6 +261,10 @@
       setInterval(function(){
         if (plantWater > 0) {
           plantWater -= 10;
+
+          if (plantWater < 0) {
+            plantWater = 0;
+          }
         }
 
         if (sprinklerOn && plantWater < 1000) {
