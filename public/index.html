@@ -237,7 +237,15 @@
       });
 
       Blockly.defineBlocksWithJsonArray(customBlocks);
-      workspace = Blockly.inject('blocklyDiv', { toolbox: document.getElementById('toolbox') });
+      workspace = Blockly.inject(
+        'blocklyDiv',
+        {
+          toolbox: document.getElementById('toolbox'),
+          zoom: {
+            controls: true
+          }
+        }
+      );
       workspace.addChangeListener(saveBlocks);
       workspace.addChangeListener(enableRun);
       workspace.addChangeListener(Blockly.Events.disableOrphans);
