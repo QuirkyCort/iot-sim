@@ -236,10 +236,10 @@
     function genArduino() {
       var code = Blockly.Arduino.workspaceToCode(workspace);
 
-      if (code.search('void d1Clicked() {') == -1) {
+      if (code.search(/void d1Clicked\(\) {/) == -1) {
         code = code.replace(/ *if \(digitalRead\(D1\)\) d1Clicked\(\);\n/, '');
       }
-      if (code.search('void _loop() {') == -1) {
+      if (code.search(/void _loop\(\) {/) == -1) {
         code = code.replace(/ *_loop\(\);\n/, '');
       }
 
