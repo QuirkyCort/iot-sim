@@ -192,7 +192,29 @@ var customBlocks = [{
   "colour": 330,
   "tooltip": "",
   "helpUrl": ""
-}];
+},
+{
+  "type": "connect_to_wifi",
+  "message0": "Connect to WiFi %1 with password %2",
+  "args0": [
+    {
+      "type": "field_input",
+      "name": "SSID",
+      "text": "SSID"
+    },
+    {
+      "type": "field_input",
+      "name": "PASSWORD",
+      "text": "password"
+    }
+  ],
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 230,
+  "tooltip": "",
+  "helpUrl": ""
+}
+];
 
 Blockly.JavaScript['when_started'] = function(block) {
   var statements = Blockly.JavaScript.statementToCode(block, 'NAME');
@@ -296,4 +318,8 @@ Blockly.JavaScript['loop_forever'] = function(block) {
 Blockly.JavaScript['a0'] = function(block) {
   var code = 'plantWater';
   return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['connect_to_wifi'] = function(block) {
+  return '';
 };

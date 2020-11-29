@@ -11,6 +11,7 @@
   <script src="blockly/blocks_compressed.js"></script>
   <script src="blockly/javascript_compressed.js"></script>
   <script src="blockly/msg/js/en.js"></script>
+  <script src="blockly/arduino.js"></script>
 
   <script src="js/customBlocks.js?v=050eb0fe"></script>
 
@@ -46,6 +47,9 @@
   <br><br>
 
   <div id="blocklyDiv" style="height: 600px; width: 1200px;"></div>
+
+  <button id="genArduinoCode">Generate Arduino Code</button>
+  <div id="arduino" style="white-space: pre; font-family: monospace;"></div>
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="Blynk" colour="#9fa55b">
       <block type="when_started"></block>
@@ -56,6 +60,7 @@
       <block type="data"></block>
       <block type="a0"></block>
       <block type="d1_clicked"></block>
+      <block type="connect_to_wifi"></block>
       <block type="connect">
         <field name="auth"></field>
       </block>
@@ -228,6 +233,20 @@
       $('#run').attr('disabled', false);
     }
 
+    function genArduino() {
+      var code = Blockly.Arduino.workspaceToCode(workspace);
+
+      if (code.search('void d1Clicked() {') == -1) {
+        code = code.replace(/ *if \(digitalRead\(D1\)\) d1Clicked\(\);\n/, '');
+      }
+      if (code.search('void _loop() {') == -1) {
+        code = code.replace(/ *_loop\(\);\n/, '');
+      }
+
+      document.getElementById('arduino').textContent = code;
+    }
+
+
     var plantWater = 1000;
     var sprinklerOn = false;
 
@@ -235,6 +254,8 @@
       $('#btnConnect').click(function() {
         initBlynk($("#auth").val());
       });
+
+      $('#genArduinoCode').click(genArduino);
 
       Blockly.defineBlocksWithJsonArray(customBlocks);
       workspace = Blockly.inject(
