@@ -276,10 +276,11 @@ Blockly.Arduino['when_started'] = function(block) {
   var statements_name = Blockly.Arduino.statementToCode(block, 'NAME');
 
   var code =
-    '#include <ESP8266WiFi.h>\n' +
-    '#include <BlynkSimpleEsp8266.h>\n\n' +
     'void setup() {\n' +
     statements_name +
+    '  pinMode(D0, OUTPUT);\n' +
+    '  pinMode(D2, OUTPUT);\n' +
+    '  pinMode(D3, OUTPUT);\n' +
     '}\n\n' +
     'void loop() {\n' +
     '  _loop();\n' +
