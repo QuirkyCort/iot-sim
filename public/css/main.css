@@ -44,3 +44,23 @@
   bottom: 460px;
   left: 1078px;
 }
+
+#copyCode {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  top: -25px;
+  background: black;
+  color: white;
+  padding: 0.3em;
+  border-radius: 0.3em;
+  display: none;
+}
+
+#arduino {
+  display: block;
+  white-space: pre;
+  font-family: monospace;
+}

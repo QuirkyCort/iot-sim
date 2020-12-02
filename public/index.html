@@ -49,7 +49,9 @@
   <div id="blocklyDiv" style="height: 600px; width: 1200px;"></div>
 
   <button id="genArduinoCode">Generate Arduino Code</button>
-  <div id="arduino" style="white-space: pre; font-family: monospace;"></div>
+  <button id="copyCode" data-original-title="Copied!">Copy code<div class="tooltip">Copied!</div></button>
+  <textarea id="arduino" cols=120 rows=20></textarea>
+
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="Blynk" colour="#9fa55b">
       <block type="when_started"></block>
@@ -250,6 +252,19 @@
     }
 
 
+    function copyCode () {
+      $('#copyCode .tooltip').css('display', 'block');
+      // $body.find('textarea')[0].select();
+      // $body.find('textarea')[0].setSelectionRange(0, 99999); /*For mobile devices*/
+      // document.execCommand("copy");
+      document.getElementById('arduino').select();
+      document.getElementById('arduino').setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      setTimeout(function() {
+        $('#copyCode .tooltip').css('display', 'none');
+      }, 500);
+    }
+
     var plantWater = 1000;
     var sprinklerOn = false;
 
@@ -259,6 +274,7 @@
       });
 
       $('#genArduinoCode').click(genArduino);
+      $('#copyCode').click(copyCode);
 
       Blockly.defineBlocksWithJsonArray(customBlocks);
       workspace = Blockly.inject(
