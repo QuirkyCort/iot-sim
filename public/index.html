@@ -44,6 +44,8 @@
   <br>
   <button id="run">Run</button>
   <input id="console" type="text" disabled style="width: 40em;">
+  <input id="space" type="checkbox">
+  <label for="space">More Space</label>
   <br><br>
 
   <div id="blocklyDiv" style="height: 600px; width: 1200px;"></div>
@@ -269,6 +271,16 @@
     var sprinklerOn = false;
 
     function init() {
+      $('#space').change(function(e) {
+        if (e.target.checked) {
+          $('#blocklyDiv').css('height', '900px');
+          window.dispatchEvent(new Event('resize'));
+        } else {
+          $('#blocklyDiv').css('height', '600px');
+          window.dispatchEvent(new Event('resize'));
+        }
+      });
+
       $('#btnConnect').click(function() {
         initBlynk($("#auth").val());
       });
