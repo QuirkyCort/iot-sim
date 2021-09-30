@@ -163,12 +163,17 @@ function init() {
     if (typeof window['clicked' + pin] == 'function') {
       window['clicked' + pin]()
     }
+    window['get' + pin] = function() { return 1; };
   });
   $('.button').on('pointerup', function(e) {
+    let pin = e.currentTarget.getAttribute('pin');
     e.currentTarget.src = 'images/buttonOff.png?v=a0014273';
+    window['get' + pin] = function() { return 0; };
   });
   $('.button').on('pointerleave', function(e) {
+    let pin = e.currentTarget.getAttribute('pin');
     e.currentTarget.src = 'images/buttonOff.png?v=a0014273';
+    window['get' + pin] = function() { return 0; };
   });
 
   // Run blocks

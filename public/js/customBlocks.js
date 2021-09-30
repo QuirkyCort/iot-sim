@@ -476,6 +476,58 @@ var customBlocks = [{
   "helpUrl": ""
 },
 {
+  "type": "dPinValue",
+  "message0": "Value of %1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "pin",
+      "options": [
+        [
+          "D0",
+          "D0"
+        ],
+        [
+          "D1",
+          "D1"
+        ],
+        [
+          "D2",
+          "D2"
+        ],
+        [
+          "D3",
+          "D3"
+        ],
+        [
+          "D4",
+          "D4"
+        ],
+        [
+          "D5",
+          "D5"
+        ],
+        [
+          "D6",
+          "D6"
+        ],
+        [
+          "D7",
+          "D7"
+        ],
+        [
+          "D8",
+          "D8"
+        ]
+      ]
+    },
+  ],
+  "output": "Number",
+  "colour": 330,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
   "type": "connect_to_wifi",
   "message0": "Connect to WiFi %1 with password %2",
   "args0": [
@@ -628,6 +680,15 @@ Blockly.JavaScript['a0'] = function(block) {
   let code = '0';
   if (typeof getA0 == 'function') {
     code = 'getA0()';
+  }
+  return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['dPinValue'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  let code = '0';
+  if (typeof window['get' + dropdown_pin] == 'function') {
+    code = 'get' + dropdown_pin + '()';
   }
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
