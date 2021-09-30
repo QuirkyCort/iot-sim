@@ -11,13 +11,13 @@
   <script src="blockly/blocks_compressed.js"></script>
   <script src="blockly/javascript_compressed.js"></script>
   <script src="blockly/msg/js/en.js"></script>
-  <script src="blockly/arduino.js?v=66592a04"></script>
+  <script src="blockly/arduino.js?v=badf1389"></script>
 
   <script src="js/customBlocks.js"></script>
   <script src="js/custom.js"></script>
 
-  <link rel="stylesheet" href="css/main.css?v=e990d485">
-  <link rel="stylesheet" href="css/home.css?v=e990d485">
+  <link rel="stylesheet" href="css/main.css?v=542c0577">
+  <link rel="stylesheet" href="css/home.css?v=36af1d75">
 </head>
 
 <body>
@@ -214,14 +214,14 @@
         $('#sprinkler').attr('src', 'images/sprinklerOff.png?v=e77ccb1f');
       } else {
         sprinklerOn = true;
-        $('#sprinkler').attr('src', 'images/sprinklerOn.png?v=e77ccb1f');
+        $('#sprinkler').attr('src', 'images/sprinklerOn.png?v=ce567175');
       }
     }
     analogWriteD2 = digitalWriteD2;
 
     function digitalWriteD3(value) {
       if (value == 0) {
-        $('#door').attr('src', 'images/doorClose.png?v=4531e2d9');
+        $('#door').attr('src', 'images/doorClose.png?v=2a176ab2');
       } else {
         $('#door').attr('src', 'images/doorOpen.png?v=4531e2d9');
       }
