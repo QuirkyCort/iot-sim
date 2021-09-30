@@ -272,25 +272,6 @@ Blockly.Arduino.getAdjusted = function(block, atId, opt_delta, opt_negate,
   return at;
 };
 
-Blockly.Arduino['when_started'] = function(block) {
-  var statements_name = Blockly.Arduino.statementToCode(block, 'NAME');
-
-  var code =
-    'void setup() {\n' +
-    statements_name +
-    '  pinMode(D0, OUTPUT);\n' +
-    '  pinMode(D2, OUTPUT);\n' +
-    '  pinMode(D3, OUTPUT);\n' +
-    '}\n\n' +
-    'void loop() {\n' +
-    '  _loop();\n' +
-    '  if (digitalRead(D1)) d1Clicked();\n' +
-    '  Blynk.run();\n' +
-    '}\n\n';
-
-    return code;
-};
-
 Blockly.Arduino['loop_forever'] = function(block) {
   var statements_name = Blockly.Arduino.statementToCode(block, 'NAME');
 
@@ -405,6 +386,36 @@ Blockly.Arduino['change_state'] = function(block) {
   return code;
 };
 
+Blockly.Arduino['analog_write'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var value_msg = Blockly.Arduino.valueToCode(block, 'value', Blockly.Arduino.ORDER_ATOMIC);
+
+  let code = '';
+  if (typeof window['analogWrite' + dropdown_pin] == 'function') {
+    code = 'analogWrite(' + dropdown_pin + ', ' + value_msg + ');\n';
+  }
+  return code;
+};
+
+Blockly.Arduino['digital_write'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var value_msg = Blockly.Arduino.valueToCode(block, 'value', Blockly.Arduino.ORDER_ATOMIC);
+
+  let code = '';
+  if (typeof window['digitalWrite' + dropdown_pin] == 'function') {
+    code = 'digitalWrite(' + dropdown_pin + ', ' + value_msg + ');\n';
+  }
+  return code;
+};
+
+Blockly.Arduino['set_virtual'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var value_msg = Blockly.Arduino.valueToCode(block, 'value', Blockly.Arduino.ORDER_ATOMIC);
+
+  code = 'Blynk.virtualWrite(' + dropdown_pin + ', ' + value_msg + ');\n';
+  return code;
+};
+
 Blockly.Arduino['notification'] = function(block) {
   var value_msg = Blockly.Arduino.valueToCode(block, 'msg', Blockly.Arduino.ORDER_ATOMIC);
 
@@ -470,15 +481,27 @@ Blockly.Arduino['on_write'] = function(block) {
   return code;
 };
 
+Blockly.Arduino['on_read'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var statements = Blockly.Arduino.statementToCode(block, 'NAME');
+
+  var code =
+    'BLYNK_READ(' + dropdown_pin + ') {\n' +
+    statements +
+    '}\n';
+  return code;
+};
+
 Blockly.Arduino['data'] = function(block) {
   var code = 'param.asInt()';
   return [code, Blockly.Arduino.ORDER_ATOMIC];
 };
 
-Blockly.Arduino['d1_clicked'] = function(block) {
+Blockly.Arduino['d_clicked'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
   var statements = Blockly.Arduino.statementToCode(block, 'NAME');
   var code =
-    'void d1Clicked() {\n' +
+    'void clicked' + dropdown_pin + '() {\n' +
     statements +
     '};\n';
   return code;

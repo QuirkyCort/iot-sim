@@ -39,9 +39,52 @@ var customBlocks = [{
   "helpUrl": ""
 },
 {
-  "type": "d1_clicked",
-  "message0": "When D1 is pressed %1 %2",
+  "type": "d_clicked",
+  "message0": "When %1 is pressed %2 %3",
   "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "pin",
+      "options": [
+        [
+          "D0",
+          "D0"
+        ],
+        [
+          "D1",
+          "D1"
+        ],
+        [
+          "D2",
+          "D2"
+        ],
+        [
+          "D3",
+          "D3"
+        ],
+        [
+          "D4",
+          "D4"
+        ],
+        [
+          "D5",
+          "D5"
+        ],
+        [
+          "D6",
+          "D6"
+        ],
+        [
+          "D7",
+          "D7"
+        ],
+        [
+          "D8",
+          "D8"
+        ]
+
+      ]
+    },
     {
       "type": "input_dummy"
     },
@@ -61,6 +104,167 @@ var customBlocks = [{
     {
       "type": "input_value",
       "name": "msg"
+    }
+  ],
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 230,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "analog_write",
+  "message0": "Analog Write %1 %2",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "pin",
+      "options": [
+        [
+          "D0",
+          "D0"
+        ],
+        [
+          "D1",
+          "D1"
+        ],
+        [
+          "D2",
+          "D2"
+        ],
+        [
+          "D3",
+          "D3"
+        ],
+        [
+          "D4",
+          "D4"
+        ],
+        [
+          "D5",
+          "D5"
+        ],
+        [
+          "D6",
+          "D6"
+        ],
+        [
+          "D7",
+          "D7"
+        ],
+        [
+          "D8",
+          "D8"
+        ]
+
+      ]
+    },
+    {
+      "type": "input_value",
+      "name": "value"
+    }
+  ],
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 230,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "digital_write",
+  "message0": "Digital Write %1 %2",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "pin",
+      "options": [
+        [
+          "D0",
+          "D0"
+        ],
+        [
+          "D1",
+          "D1"
+        ],
+        [
+          "D2",
+          "D2"
+        ],
+        [
+          "D3",
+          "D3"
+        ],
+        [
+          "D4",
+          "D4"
+        ],
+        [
+          "D5",
+          "D5"
+        ],
+        [
+          "D6",
+          "D6"
+        ],
+        [
+          "D7",
+          "D7"
+        ],
+        [
+          "D8",
+          "D8"
+        ]
+
+      ]
+    },
+    {
+      "type": "input_value",
+      "name": "value"
+    }
+  ],
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 230,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "set_virtual",
+  "message0": "Set Virtual Pin %1 to %2",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "pin",
+      "options": [
+        [
+          "V0",
+          "V0"
+        ],
+        [
+          "V1",
+          "V1"
+        ],
+        [
+          "V2",
+          "V2"
+        ],
+        [
+          "V3",
+          "V3"
+        ],
+        [
+          "V4",
+          "V4"
+        ],
+        [
+          "V5",
+          "V5"
+        ]
+      ]
+    },
+    {
+      "type": "input_value",
+      "name": "value"
     }
   ],
   "previousStatement": null,
@@ -92,6 +296,60 @@ var customBlocks = [{
         [
           "V3",
           "V3"
+        ],
+        [
+          "V4",
+          "V4"
+        ],
+        [
+          "V5",
+          "V5"
+        ]
+      ]
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_statement",
+      "name": "NAME"
+    }
+  ],
+  "colour": 65,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "on_read",
+  "message0": "When app request data from %1 %2 %3",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "pin",
+      "options": [
+        [
+          "V0",
+          "V0"
+        ],
+        [
+          "V1",
+          "V1"
+        ],
+        [
+          "V2",
+          "V2"
+        ],
+        [
+          "V3",
+          "V3"
+        ],
+        [
+          "V4",
+          "V4"
+        ],
+        [
+          "V5",
+          "V5"
         ]
       ]
     },
@@ -120,12 +378,36 @@ var customBlocks = [{
           "D0"
         ],
         [
+          "D1",
+          "D1"
+        ],
+        [
           "D2",
           "D2"
         ],
         [
           "D3",
           "D3"
+        ],
+        [
+          "D4",
+          "D4"
+        ],
+        [
+          "D5",
+          "D5"
+        ],
+        [
+          "D6",
+          "D6"
+        ],
+        [
+          "D7",
+          "D7"
+        ],
+        [
+          "D8",
+          "D8"
         ]
       ]
     },
@@ -236,10 +518,11 @@ Blockly.JavaScript['connect'] = function(block) {
   return code;
 };
 
-Blockly.JavaScript['d1_clicked'] = function(block) {
+Blockly.JavaScript['d_clicked'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
   var statements = Blockly.JavaScript.statementToCode(block, 'NAME');
   var code =
-    'function d1Clicked() {\n' +
+    'function clicked' + dropdown_pin + '() {\n' +
     statements +
     '};\n';
   return code;
@@ -261,36 +544,62 @@ Blockly.JavaScript['on_write'] = function(block) {
   return code;
 };
 
+Blockly.JavaScript['on_read'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var statements = Blockly.JavaScript.statementToCode(block, 'NAME');
+  var code =
+    'function onRead' + dropdown_pin + '(data) {\n' +
+    statements +
+    '};\n';
+  return code;
+};
+
+
 Blockly.JavaScript['change_state'] = function(block) {
   var dropdown_pin = block.getFieldValue('pin');
   var dropdown_state = block.getFieldValue('state');
-  src2 = '';
-  if (dropdown_pin == 'D0') {
-    var ele = '#led';
-    if (dropdown_state == 'ON') {
-      var src = 'images/ledOn.png?v=f644be45';
-    } else {
-      var src = 'images/ledOff.png?v=0f115ad9';
+
+  let code = '';
+  if (dropdown_state == 'ON') {
+    if (typeof window['digitalWrite' + dropdown_pin] == 'function') {
+      code = 'digitalWrite' + dropdown_pin + '(1);\n';
     }
-  } else if (dropdown_pin == 'D2') {
-    var ele = '#sprinkler';
-    if (dropdown_state == 'ON') {
-      var src = 'images/sprinklerOn.png?v=ce567175';
-      src2 = 'sprinklerOn = true;\n';
-    } else {
-      var src = 'images/sprinklerOff.png?v=e77ccb1f';
-      src2 = 'sprinklerOn = false;\n';
-    }
-  } else if (dropdown_pin == 'D3') {
-    var ele = '#door';
-    if (dropdown_state == 'ON') {
-      var src = 'images/doorOpen.png?v=4531e2d9';
-    } else {
-      var src = 'images/doorClose.png?v=2a176ab2';
+  } else {
+    if (typeof window['digitalWrite' + dropdown_pin] == 'function') {
+      code = 'digitalWrite' + dropdown_pin + '(0);\n';
     }
   }
 
-  var code = '$("' + ele + '").attr("src", "' + src + '");\n' + src2;
+  return code;
+};
+
+Blockly.JavaScript['analog_write'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var value_msg = Blockly.JavaScript.valueToCode(block, 'value', Blockly.JavaScript.ORDER_ATOMIC);
+
+  let code = '';
+  if (typeof window['analogWrite' + dropdown_pin] == 'function') {
+    code = 'analogWrite' + dropdown_pin + '(' + value_msg + ');\n';
+  }
+  return code;
+};
+
+Blockly.JavaScript['digital_write'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var value_msg = Blockly.JavaScript.valueToCode(block, 'value', Blockly.JavaScript.ORDER_ATOMIC);
+
+  let code = '';
+  if (typeof window['digitalWrite' + dropdown_pin] == 'function') {
+    code = 'digitalWrite' + dropdown_pin + '(' + value_msg + ');\n';
+  }
+  return code;
+};
+
+Blockly.JavaScript['set_virtual'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  var value_msg = Blockly.JavaScript.valueToCode(block, 'value', Blockly.JavaScript.ORDER_ATOMIC);
+
+  code = 'virtualPins.' + dropdown_pin + '.write(' + value_msg + ');\n';
   return code;
 };
 
@@ -316,7 +625,10 @@ Blockly.JavaScript['loop_forever'] = function(block) {
 };
 
 Blockly.JavaScript['a0'] = function(block) {
-  var code = 'plantWater';
+  let code = '0';
+  if (typeof getA0 == 'function') {
+    code = 'getA0()';
+  }
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 

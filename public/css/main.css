@@ -11,38 +11,8 @@
   left: 20px;
 }
 
-#led {
-  position: absolute;
-  bottom: 560px;
-  left: 403px;
-}
-
-#button {
-  position: absolute;
-  bottom: 440px;
-  left: 542px;
-}
-
-#door {
-  position: absolute;
-  bottom: 90px;
-  left: 749px;
-}
-
 #run:enabled {
   background: lightgreen;
-}
-
-#plant {
-  position: absolute;
-  bottom: 171px;
-  left: 995px;
-}
-
-#sprinkler {
-  position: absolute;
-  bottom: 460px;
-  left: 1078px;
 }
 
 #copyCode {

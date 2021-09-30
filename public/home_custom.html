@@ -1,0 +1,239 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IoT Simulator with Blynk</title>
+  <script src="jquery/jquery.min.js"></script>
+  <script src="blynk/blynk-browser.js?v=fde46afb"></script>
+
+  <script src="blockly/blockly_compressed.js"></script>
+  <script src="blockly/blocks_compressed.js"></script>
+  <script src="blockly/javascript_compressed.js"></script>
+  <script src="blockly/msg/js/en.js"></script>
+  <script src="blockly/arduino.js?v=66592a04"></script>
+
+  <script src="js/customBlocks.js"></script>
+  <script src="js/custom.js"></script>
+
+  <link rel="stylesheet" href="css/main.css?v=e990d485">
+  <link rel="stylesheet" href="css/home.css?v=e990d485">
+</head>
+
+<body>
+  <h1>Internet-of-Things Simulator (Blynk Custom Server)</h1>
+  <h2>Home Automation</h2>
+
+  <div id="simulator">
+    <img id="background" draggable="false" src="images/background.png?v=29904443">
+    <img id="led" draggable="false" src="images/ledOff.png?v=0f115ad9">
+    <div id="ledBlue"></div>
+
+    <img id="button" class="button" pin="D1" draggable="false" src="images/buttonOff.png?v=a0014273">
+    <img id="door" draggable="false" src="images/doorClose.png?v=2a176ab2">
+    <img id="plant" draggable="false" src="images/plant1.png?v=2de6a6f5">
+    <img id="sprinkler" draggable="false" src="images/sprinklerOff.png?v=e77ccb1f">
+  </div>
+
+  <br>
+  <button id="run">Run</button>
+  <input id="console" type="text" disabled style="width: 40em;">
+  <input id="space" type="checkbox" checked>
+  <label for="space">More Space</label>
+  <br><br>
+
+  <div id="blocklyDiv" style="height: 900px; width: 1200px;"></div>
+
+  <button id="genArduinoCode">Generate Arduino Code</button>
+  <button id="copyCode" data-original-title="Copied!">Copy code<div class="tooltip">Copied!</div></button>
+  <textarea id="arduino" cols=120 rows=20></textarea>
+
+  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+    <category name="Blynk" colour="#9fa55b">
+      <block type="when_started"></block>
+      <block type="loop_forever"></block>
+      <block type="on_write">
+        <field name="pin">V0</field>
+      </block>
+      <block type="on_read">
+        <field name="pin">V0</field>
+      </block>
+      <block type="data"></block>
+      <block type="a0"></block>
+      <block type="d_clicked"></block>
+      <block type="connect_to_wifi"></block>
+      <block type="connect">
+        <field name="auth"></field>
+      </block>
+      <block type="notification"></block>
+      <block type="change_state">
+        <field name="pin">D0</field>
+        <field name="state">ON</field>
+      </block>
+      <block type="digital_write">
+        <field name="pin">D0</field>
+        <value name="value">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="analog_write">
+        <field name="pin">D0</field>
+        <value name="value">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="set_virtual">
+        <field name="pin">V0</field>
+        <value name="value">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Logic" colour="#5b80a5">
+      <block type="controls_if"></block>
+      <block type="logic_compare">
+        <field name="OP">EQ</field>
+      </block>
+    </category>
+    <category name="Loops" colour="#5ba55b">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Math" colour="#5b67a5">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+      <block type="math_arithmetic">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Text" colour="#5ba58c">
+      <block type="text">
+        <field name="TEXT"></field>
+      </block>
+      <block type="text_join">
+        <mutation items="2"></mutation>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <!-- <block type="parsefloat"></block> -->
+    </category>
+  </xml>
+
+  <script type="text/javascript">
+    // Custom arduino generator
+    Blockly.Arduino['when_started'] = function(block) {
+      var statements_name = Blockly.Arduino.statementToCode(block, 'NAME');
+
+      var code =
+        'void setup() {\n' +
+        statements_name +
+        '  pinMode(D0, OUTPUT);\n' +
+        '  pinMode(D2, OUTPUT);\n' +
+        '  pinMode(D3, OUTPUT);\n' +
+        '}\n\n' +
+        'void loop() {\n' +
+        '  _loop();\n' +
+        '  if (digitalRead(D1)) d1Clicked();\n' +
+        '  Blynk.run();\n' +
+        '}\n\n';
+
+        return code;
+    };
+
+    // Custom code for this page    
+    var plantWater = 1000;
+    var sprinklerOn = false;
+
+    setInterval(function(){
+      if (plantWater > 0) {
+        plantWater -= 10;
+
+        if (plantWater < 0) {
+          plantWater = 0;
+        }
+      }
+
+      if (sprinklerOn && plantWater < 1000) {
+        plantWater += 50;
+        if (plantWater > 1000) {
+          plantWater = 1000;
+        }
+      }
+
+      if (plantWater > 666) {
+        $('#plant').attr('src', 'images/plant1.png?v=2de6a6f5');
+      } else if (plantWater > 333) {
+        $('#plant').attr('src', 'images/plant2.png?v=9a51b033');
+      } else {
+        $('#plant').attr('src', 'images/plant3.png?v=d3579827');
+      }
+    }, 750);
+
+    function digitalWriteD0(value) {
+      if (value == 0) {
+        $('#ledBlue').css('opacity', 0);
+      } else {
+        $('#ledBlue').css('opacity', 1);
+      }
+    }
+    function analogWriteD0(value) {
+      $('#ledBlue').css('opacity', value / 1023);
+    }
+
+    function digitalWriteD2(value) {
+      if (value == 0) {
+        sprinklerOn = false;
+        $('#sprinkler').attr('src', 'images/sprinklerOff.png?v=e77ccb1f');
+      } else {
+        sprinklerOn = true;
+        $('#sprinkler').attr('src', 'images/sprinklerOn.png?v=e77ccb1f');
+      }
+    }
+    analogWriteD2 = digitalWriteD2;
+
+    function digitalWriteD3(value) {
+      if (value == 0) {
+        $('#door').attr('src', 'images/doorClose.png?v=4531e2d9');
+      } else {
+        $('#door').attr('src', 'images/doorOpen.png?v=4531e2d9');
+      }
+    }
+    analogWriteD3 = digitalWriteD3;
+
+    function getA0() {
+      return plantWater;
+    }
+
+    // Initialize
+    init();
+
+  </script>
+</body>
+</html>
