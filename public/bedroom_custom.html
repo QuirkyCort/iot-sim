@@ -1,0 +1,375 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IoT Simulator with Blynk</title>
+  <script src="jquery/jquery.min.js"></script>
+  <script src="blynk/blynk-browser.js?v=fde46afb"></script>
+
+  <script src="https://cdn.babylonjs.com/viewer/babylon.viewer.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+  <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+
+  <script src="blockly/blockly_compressed.js"></script>
+  <script src="blockly/blocks_compressed.js"></script>
+  <script src="blockly/javascript_compressed.js"></script>
+  <script src="blockly/msg/js/en.js"></script>
+  <script src="blockly/arduino.js?v=badf1389"></script>
+
+  <script src="js/customBlocks.js"></script>
+  <script src="js/custom.js"></script>
+
+  <link rel="stylesheet" href="css/main.css?v=542c0577">
+  <link rel="stylesheet" href="css/home.css?v=36af1d75">
+</head>
+
+<body>
+  <h1>Internet-of-Things Simulator</h1>
+  <h2>Bedroom Automation</h2>
+
+  <canvas id="renderCanvas" touch-action="none" style="width: 1200px; height: 800px;"></canvas> <!-- touch-action="none" for best results from PEP -->
+
+  <img src="images/bedroom_connections.png" style="margin: 2em;">
+
+  <br>
+  <button id="run">Run</button>
+  <input id="console" type="text" disabled style="width: 40em;">
+  <input id="space" type="checkbox" checked>
+  <label for="space">More Space</label>
+  <br><br>
+
+  <div id="blocklyDiv" style="height: 900px; width: 1200px;"></div>
+
+  <button id="genArduinoCode">Generate Arduino Code</button>
+  <button id="copyCode" data-original-title="Copied!">Copy code<div class="tooltip">Copied!</div></button>
+  <textarea id="arduino" cols=120 rows=20></textarea>
+
+  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+    <category name="Blynk" colour="#9fa55b">
+      <block type="when_started"></block>
+      <block type="loop_forever"></block>
+      <block type="on_write">
+        <field name="pin">V0</field>
+      </block>
+      <block type="on_read">
+        <field name="pin">V0</field>
+      </block>
+      <block type="data"></block>
+      <block type="a0"></block>
+      <block type="dPinValue"></block>
+      <block type="d_clicked"></block>
+      <block type="connect_to_wifi"></block>
+      <block type="connect">
+        <field name="auth"></field>
+      </block>
+      <block type="notification"></block>
+      <block type="change_state">
+        <field name="pin">D0</field>
+        <field name="state">ON</field>
+      </block>
+      <block type="digital_write">
+        <field name="pin">D0</field>
+        <value name="value">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="analog_write">
+        <field name="pin">D0</field>
+        <value name="value">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="set_virtual">
+        <field name="pin">V0</field>
+        <value name="value">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Logic" colour="#5b80a5">
+      <block type="controls_if"></block>
+      <block type="logic_compare">
+        <field name="OP">EQ</field>
+      </block>
+    </category>
+    <category name="Loops" colour="#5ba55b">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Math" colour="#5b67a5">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+      <block type="math_arithmetic">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Text" colour="#5ba58c">
+      <block type="text">
+        <field name="TEXT"></field>
+      </block>
+      <block type="text_join">
+        <mutation items="2"></mutation>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <!-- <block type="parsefloat"></block> -->
+    </category>
+    <!-- <category name="Variables" colour="#a55b80" custom="VARIABLE"></category> -->
+  </xml>
+
+  <script type="text/javascript">
+    // Custom arduino generator
+    Blockly.Arduino['when_started'] = function(block) {
+      var statements_name = Blockly.Arduino.statementToCode(block, 'NAME');
+
+      var code =
+        'void setup() {\n' +
+        statements_name +
+        '  pinMode(D0, OUTPUT);\n' +
+        '  pinMode(D1, OUTPUT);\n' +
+        '  pinMode(D2, OUTPUT);\n' +
+        '  pinMode(D3, OUTPUT);\n' +
+        '}\n\n' +
+        'void loop() {\n' +
+        '  _loop();\n' +
+        '  if (digitalRead(D4)) clickedD4();\n' +
+        '  Blynk.run();\n' +
+        '}\n\n';
+
+        return code;
+    };
+
+    // Setup babylon
+    const canvas = document.getElementById("renderCanvas"); // Get the canvas element
+    const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+    let light, camera, airconIndicator;
+    let airconOnMat, airconOffMat, thermometerReading;
+    let rat;
+
+    function createScene() {
+        const scene = new BABYLON.Scene(engine);  
+
+        BABYLON.SceneLoader.ImportMeshAsync("", "models/", "bedroom.glb");
+        BABYLON.SceneLoader.ImportMeshAsync("", "models/", "Rat.glb").then(function(result) {
+          rat = result;
+          rat.meshes[0].scaling.x = 0.08;
+          rat.meshes[0].scaling.y = 0.08;
+          rat.meshes[0].scaling.z = 0.08;
+          rat.animationGroups[0].stop();
+          rat.animationGroups[5].start(true);
+          rat.meshes[0].position.z = 2;
+        });
+
+        let gl = new BABYLON.GlowLayer("glow", scene);
+        gl.intensity = 5;
+
+        camera = new BABYLON.UniversalCamera("camera", new BABYLON.Vector3(-1.4, 1.2, 0.9), scene);
+        camera.minZ = 0.1;
+        camera.rotation.y = Math.PI / 2;
+        camera.rotation.x = 0;
+        // camera.setTarget(BABYLON.Vector3.Zero());
+        // camera.attachControl(canvas, true);
+
+        light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-0.3, 1, 0.1));
+        light.intensity = 0.05;
+
+        airconOnMat = new BABYLON.StandardMaterial("airconOn", scene);
+        airconOnMat.emissiveColor = new BABYLON.Color3(0, 0, 1);
+        airconOffMat = new BABYLON.StandardMaterial("airconOff", scene);
+        airconOffMat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+
+        airconIndicator = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.01}, scene);
+        airconIndicator.position.x = -0.613;
+        airconIndicator.position.y = 1.06;
+        airconIndicator.position.z = -1.085;
+        airconIndicator.material = airconOffMat;
+
+        var black = new BABYLON.StandardMaterial('black', scene);
+        black.diffuseColor = new BABYLON.Color3(0, 0, 0);
+
+        var thermometerBack = BABYLON.MeshBuilder.CreateBox('box', {width: 0.2, depth: 0.01, height: 0.08}, scene);
+        thermometerBack.material = black;
+        thermometerBack.rotation.y = Math.PI;
+        thermometerBack.position.y = 1.15;
+        thermometerBack.position.z = -1.13;
+        thermometerBack.position.x = -0.9;
+
+        var thermometer = BABYLON.Mesh.CreatePlane("plane", 2);
+        thermometer.parent = thermometerBack;
+        thermometer.position.z = -0.01;
+
+        var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(thermometer);
+        thermometerReading = new BABYLON.GUI.TextBlock();
+        thermometerReading.text = '32.0 °C';
+        thermometerReading.color = '#55aa55';
+        thermometerReading.fontSize = 24;
+        advancedTexture.addControl(thermometerReading); 
+
+        return scene;
+    }
+
+    const scene = createScene(); //Call the createScene function
+
+    // Register a render loop to repeatedly render the scene
+    engine.runRenderLoop(function () {
+            scene.render();
+    });
+
+    // Watch for browser/canvas resize events
+    window.addEventListener("resize", function () {
+            engine.resize();
+    });
+
+    // Custom code for this page
+    var temperature = 32;
+    var airconOn = false;
+
+    setInterval(function(){
+      if (temperature < 32) {
+        temperature += 0.05
+      }
+
+      if (airconOn && temperature > 17) {
+        temperature -= 0.1;
+      }
+
+      let temperatureDisplay = Math.round(temperature * 10) / 10;
+
+      thermometerReading.text = temperatureDisplay + ' °C';
+    }, 1000);
+
+    // Lights
+    function digitalWriteD0(value) {
+      if (value == 0) {
+        light.intensity = 0.05;
+      } else {
+        light.intensity = 1;
+      }
+    }
+    function analogWriteD0(value) {
+      light.intensity = value / 1023 * 0.95 + 0.05;
+    }
+
+    // Aircon
+    function digitalWriteD1(value) {
+      if (value == 0) {
+        airconIndicator.material = airconOffMat;
+        airconOn = false;
+      } else {
+        airconIndicator.material = airconOnMat;
+        airconOn = true;
+      }
+    }
+    analogWriteD1 = digitalWriteD1;
+
+    function getA0() {
+      return (temperature * 20);
+    }
+
+    // Camera pan
+    let targetCameraX = 0;
+    let targetCameraY = Math.PI / 2;
+    setInterval(function(){
+      if (Math.abs(camera.rotation.y - targetCameraY) > 0.02) {
+        if (camera.rotation.y > targetCameraY) {
+          camera.rotation.y -= 0.005;
+        } else {
+          camera.rotation.y += 0.005;
+        }
+      }
+
+      if (Math.abs(camera.rotation.x - targetCameraX) > 0.02) {
+        if (camera.rotation.x > targetCameraX) {
+          camera.rotation.x -= 0.005;
+        } else {
+          camera.rotation.x += 0.005;
+        }
+      }
+
+    }, 10);
+
+    function digitalWriteD2(value) {
+      if (value == 0) {
+        targetCameraY =  Math.PI / 2;
+      } else {
+        targetCameraY = Math.PI;
+      }
+    }
+    function analogWriteD2(value) {
+      targetCameraY = Math.PI / 2 + (value / 1023) * Math.PI / 2;
+    }
+
+    function digitalWriteD3(value) {
+      if (value == 0) {
+        targetCameraX = Math.PI / 2;
+      } else {
+        targetCameraX = 0;
+      }
+    }
+    function analogWriteD3(value) {
+      targetCameraX = Math.PI / 2 - (value / 1023) * Math.PI / 2;
+    }
+
+    // Rat and motion sensor
+    let pinD4Value = 0;
+    var getD4 = function() { return pinD4Value; };
+
+    setInterval(function(){
+      if (typeof rat == 'undefined') {
+        return;
+      }
+
+      if (rat.meshes[0].position.z < -4) {
+        rat.meshes[0].position.z = 2;
+      } else {
+        rat.meshes[0].position.z -= 0.0015;
+      }
+
+      if (rat.meshes[0].position.z > -1.34 && rat.meshes[0].position.z < 1.2) {
+        if (pinD4Value == 0) {
+          pinD4Value = 1;
+          if (typeof clickedD4 == 'function') {
+            clickedD4();
+          }
+        }
+      } else {
+        pinD4Value = 0;
+      }
+    }, 10);
+
+
+    // Initialize
+    init();
+
+  </script>
+</body>
+</html>

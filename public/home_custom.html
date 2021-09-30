@@ -21,7 +21,7 @@
 </head>
 
 <body>
-  <h1>Internet-of-Things Simulator (Blynk Custom Server)</h1>
+  <h1>Internet-of-Things Simulator</h1>
   <h2>Home Automation</h2>
 
   <div id="simulator">
@@ -161,7 +161,7 @@
         '}\n\n' +
         'void loop() {\n' +
         '  _loop();\n' +
-        '  if (digitalRead(D1)) d1Clicked();\n' +
+        '  if (digitalRead(D1)) clickedD1();\n' +
         '  Blynk.run();\n' +
         '}\n\n';
 
