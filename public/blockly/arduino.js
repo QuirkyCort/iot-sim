@@ -106,7 +106,7 @@ Blockly.Arduino.init = function(workspace) {
   // Declare all of the variables.
   if (defvars.length) {
     Blockly.Arduino.definitions_['variables'] =
-        'var ' + defvars.join(', ') + ';';
+        'int ' + defvars.join(', ') + ';';
   }
 };
 
@@ -360,9 +360,16 @@ Blockly.Arduino['logic_compare'] = function(block) {
 };
 
 Blockly.Arduino['a0'] = function(block) {
-  var code = 'A0';
+  var code = 'analogRead(A0)';
   return [code, Blockly.Arduino.ORDER_ATOMIC];
 };
+
+Blockly.Arduino['dPinValue'] = function(block) {
+  var dropdown_pin = block.getFieldValue('pin');
+  let code = 'digitalRead(' + dropdown_pin + ')';
+  return [code, Blockly.Arduino.ORDER_ATOMIC];
+};
+
 
 Blockly.Arduino['math_number'] = function(block) {
   // Numeric value.
@@ -506,6 +513,29 @@ Blockly.Arduino['d_clicked'] = function(block) {
     '};\n';
   return code;
 };
+
+Blockly.Arduino.variables_get = function() {
+  // Variable getter.
+  var code = Blockly.Arduino.variableDB_.getName(this.getFieldValue('VAR'),
+      Blockly.Variables.NAME_TYPE);
+  return [code, Blockly.Arduino.ORDER_ATOMIC];
+};
+
+Blockly.Arduino.variables_set = function() {
+  // Variable setter.
+  var argument0 = Blockly.Arduino.valueToCode(this, 'VALUE', Blockly.Arduino.ORDER_ASSIGNMENT) || '0';
+  var varName = Blockly.Arduino.variableDB_.getName(this.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+
+  return varName + ' = ' + argument0 + ';\n';
+};
+
+Blockly.Arduino['math_change'] = function(block) {
+  var argument0 = Blockly.Arduino.valueToCode(block, 'DELTA', Blockly.Arduino.ORDER_ADDITION) || '0';
+  var varName = Blockly.Arduino.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+
+  return varName + ' += ' + argument0 + ';\n';
+};
+
 
 Blockly.Arduino['controls_repeat_ext'] = function(block) {
   // Repeat n times.
