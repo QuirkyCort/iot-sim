@@ -16,7 +16,7 @@ var initBlynk = function(auth) {
 
     vp.on('write', function(param) {
       var status = param[0];
-      console.log('V0: ' + status);
+      console.log('V' + pin + ': ' + status);
       if (typeof window['onWriteV' + pin] == 'function') {
         window['onWriteV' + pin](status);
       }
@@ -184,5 +184,5 @@ function init() {
     if (typeof _loop == 'function') {
       _loop();
     }
-  }, 1000);
+  }, 200);
 }

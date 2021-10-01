@@ -1,0 +1,93 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Register Custom Blynk Account</title>
+  <style>
+      input,button {
+          font-size: 150%;
+      }
+  </style>
+</head>
+
+<body>
+  <h1>Register Custom Blynk Account</h1>
+
+  <input id="email" type="text" placeholder="Email address"><br>
+  <input id="password1" type="password" placeholder="Password"><br>
+  <input id="password2" type="password" placeholder="Repeat Password"><br>
+  <input id="code" type="text" placeholder="Registration Code"><br>
+  <button id="submit">Submit</button>
+
+  <div id="message"></div>
+
+  <script>
+      const POST_URL = 'register.php';
+
+      function message(html) {
+        document.getElementById('message').innerHTML = html;
+      }
+
+      function validateEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+      }
+
+      function submit() {
+        message('');
+
+        let email = document.getElementById('email').value.trim();
+        let password1 = document.getElementById('password1').value.trim();
+        let password2 = document.getElementById('password2').value.trim();
+        let code = document.getElementById('code').value.trim();
+
+        if (password1.length < 6) {
+            message('Password must be at least 6 characters long.');
+            return;
+        }
+
+        if (password1 != password2) {
+            message('Password and Repeat Password are different.');
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            message('A valid email address must be supplied.');
+            return;
+        }
+
+        if (code.length < 1) {
+            message('A registration code must be supplied.');
+            return;
+        }
+
+        let data = {
+            email: email,
+            password: password1,
+            code: code
+        };
+
+        let init = {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        }
+
+        fetch(POST_URL, init)
+            .then(response => response.text())
+            .then(text => message(text));
+      }
+
+      document.getElementById('submit').onclick = submit;
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+#warning {
+    position: absolute;
+    top: 730px;
+    left: 25px;
+    color: #0000ff;
+    font-size: 300%;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.hide {
+    display: none;
+}
+#warning.hot {
+    color: #ff0000;
+}

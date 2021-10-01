@@ -22,13 +22,18 @@
   <script src="js/custom.js"></script>
 
   <link rel="stylesheet" href="css/main.css?v=542c0577">
+  <link rel="stylesheet" href="css/bedroom.css?v=333f105b">
 </head>
 
 <body>
   <h1>Internet-of-Things Simulator</h1>
   <h2>Bedroom Automation</h2>
 
-  <canvas id="renderCanvas" touch-action="none" style="width: 1200px; height: 800px;"></canvas> <!-- touch-action="none" for best results from PEP -->
+  
+  <div style="position: relative;">
+    <canvas id="renderCanvas" touch-action="none" style="width: 1200px; height: 800px;"></canvas> <!-- touch-action="none" for best results from PEP -->
+    <div id="warning" class="hide"></div>
+  </div>
 
   <h3>Connection Diagram</h3>
   <img src="images/bedroom_connections.png?v=6b825aff" style="margin: 1em;">
@@ -250,7 +255,7 @@
     });
 
     // Custom code for this page
-    var temperature = 32;
+    var temperature = 25;
     var airconOn = false;
 
     setInterval(function(){
@@ -265,6 +270,26 @@
       let temperatureDisplay = Math.round(temperature * 10) / 10;
 
       thermometerReading.text = temperatureDisplay + ' °C';
+
+      if (temperature > 30) {
+        $('#warning').removeClass('hide');
+        $('#warning').addClass('hot');
+        $('#warning').text('It\'s extremely hot!');
+      } else if (temperature > 27) {
+        $('#warning').removeClass('hide');
+        $('#warning').addClass('hot');
+        $('#warning').text('It\'s getting warm.');
+      } else if (temperature > 23) {
+        $('#warning').addClass('hide');
+      } else if (temperature > 20) {
+        $('#warning').removeClass('hide');
+        $('#warning').removeClass('hot');
+        $('#warning').text('It\'s a little chilly.');
+      } else {
+        $('#warning').removeClass('hide');
+        $('#warning').removeClass('hot');
+        $('#warning').text('It\'s freezing!');
+      }
     }, 1000);
 
     // Lights
@@ -299,19 +324,21 @@
     let targetCameraX = 0;
     let targetCameraY = Math.PI / 2;
     setInterval(function(){
+      const CAMSPEED = 0.003;
+
       if (Math.abs(camera.rotation.y - targetCameraY) > 0.02) {
         if (camera.rotation.y > targetCameraY) {
-          camera.rotation.y -= 0.005;
+          camera.rotation.y -= CAMSPEED;
         } else {
-          camera.rotation.y += 0.005;
+          camera.rotation.y += CAMSPEED;
         }
       }
 
       if (Math.abs(camera.rotation.x - targetCameraX) > 0.02) {
         if (camera.rotation.x > targetCameraX) {
-          camera.rotation.x -= 0.005;
+          camera.rotation.x -= CAMSPEED;
         } else {
-          camera.rotation.x += 0.005;
+          camera.rotation.x += CAMSPEED;
         }
       }
 
