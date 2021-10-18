@@ -17,7 +17,7 @@
   <input id="email" type="text" placeholder="Email address"><br>
   <input id="password1" type="password" placeholder="Password"><br>
   <input id="password2" type="password" placeholder="Repeat Password"><br>
-  <input id="code" type="text" placeholder="Registration Code"><br>
+  <!-- <input id="code" type="text" placeholder="Registration Code"><br> -->
   <button id="submit">Submit</button>
 
   <div id="message"></div>
@@ -40,7 +40,7 @@
         let email = document.getElementById('email').value.trim();
         let password1 = document.getElementById('password1').value.trim();
         let password2 = document.getElementById('password2').value.trim();
-        let code = document.getElementById('code').value.trim();
+        // let code = document.getElementById('code').value.trim();
 
         if (password1.length < 6) {
             message('Password must be at least 6 characters long.');
@@ -57,15 +57,15 @@
             return;
         }
 
-        if (code.length < 1) {
-            message('A registration code must be supplied.');
-            return;
-        }
+        // if (code.length < 1) {
+        //     message('A registration code must be supplied.');
+        //     return;
+        // }
 
         let data = {
             email: email,
             password: password1,
-            code: code
+            // code: code
         };
 
         let init = {

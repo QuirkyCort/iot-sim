@@ -15,7 +15,7 @@
         "isFacebookUser" => false,
         "isSuperAdmin" => true,
         "energy" => 100000,
-        "id" => "" //"admin@aposteriori.com.sg-Blynk"
+        "id" => ""
     ];
 
     $json = file_get_contents('php://input');
@@ -32,12 +32,12 @@
         exit();
     }
 
-    if (strtoupper($data['code']) != $CODE ) {
-        print('Invalid registration code.');
-        exit();
-    }
+    // if (strtoupper($data['code']) != $CODE ) {
+    //     print('Invalid registration code.');
+    //     exit();
+    // }
 
-    $filename = $data['email'] . '.Blynk.user';
+    $filename = basename($data['email'] . '.Blynk.user');
     $path = $DATA_DIR . '/' . $filename;
 
     if (file_exists($path)) {
